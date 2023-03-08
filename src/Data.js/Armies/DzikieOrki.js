@@ -64,7 +64,7 @@ export const dzikieOrki = {
       startingEquipment: ["Sztylet", "Rembak"],
       cost: 40,
       number: 15,
-      equipmentList: heroEquipment["Łowcze plemię Dzikich Orków"]["Dziki Ork"],
+      equipmentList: heroEquipment["Łowcze plemię Dzikich Orków"]["Dziki Ork Dźgacz"],
       type: "Stronnik",
       stats: {
         Początkowa: [4, 3, 3, 3, 4, 1, 2, 1, 7],

@@ -3004,6 +3004,20 @@ export const heroEquipment = {
     "Dziki Ork": {
       "Broń wielka": [10, 0],
       "Buława/Maczuga/Młot bojowy": [5, 0],
+      "Gwiazda zaranna": [5, 0],
+      Rembak: [5, 0],
+      Sztylet: [2, 0],
+      "Topór bojowy/Nadziak": [5, 0],
+      Włócznia: [10, 0],
+      "Broń miotana (noże)": [10, 1],
+      Łuk: [10, 1],
+      Lekki: [5, 2, "Zbroja"],
+      Tarcza: [5, 2, "Tarcza"],
+      Hełm: [5, 2],
+    },
+    "Dziki Ork Dźgacz": {
+      "Broń wielka": [10, 0],
+      "Buława/Maczuga/Młot bojowy": [5, 0],
       "Duża dźgacz": [30, 0],
       "Gwiazda zaranna": [5, 0],
       Rembak: [5, 0],
@@ -3015,6 +3029,7 @@ export const heroEquipment = {
       Lekki: [5, 2, "Zbroja"],
       Tarcza: [5, 2, "Tarcza"],
       Hełm: [5, 2],
+      "Duże Dźgacze": [0,3]
     },
     "Leśny Goblin": {
       "Buława/Maczuga/Młot bojowy": [5, 0],

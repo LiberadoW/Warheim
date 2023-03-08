@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "../styles/WeaponList.css";
 import { disableButtons } from "../Functions/disableButtons";
 import mageEquipmentList from "../Data.js/MageEquipmentList";
@@ -12,13 +12,15 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
     commandGroupUnit.commandGroup ? commandGroupUnit : ""
   );
 
-  const [isCommandGroup, setCommandGroup] = useState(
-    unitList[id].rules.includes("Chorążowie & sygnaliści")
-  );
+  const isCommandGroup = unitList[id].rules.includes("Chorążowie & sygnaliści");
+  const isWeaponTeam = unitList[id].rules.includes("Duża dźgacz");
 
   const [isPromptShown, setIsPromptShown] = useState(null);
   const [promptUnit, setPromptUnit] = useState(null);
   const [delayHandler, setDelayHandler] = useState(null);
+  const [numberOfShootingWeapons, setNumberOfShootingWeapons] = useState(0);
+  const [areShootingWeaponsDisabled, setAreShootingWeaponsDisabled] =
+    useState(false);
 
   const handleMouseEnter = (e) => {
     setPromptUnit(
@@ -40,34 +42,30 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
 
   const unitArray = Array.from(document.querySelectorAll(".unit"));
 
+  console.log(unitList[id])
+
   useEffect(() => {
-    const numberOfShootingWeaponsArray = [];
+    const equipment = {};
+    unitList[id].optionalEquipment
+      .concat(unitList[id].startingEquipment)
+      .forEach((item) => {
+        equipment[item] = unitList[id].equipmentList[item];
+      });
+    const numberOfShootingWeapons = Object.values(equipment).filter(
+      (a) => a[1] === 1
+    ).length;
+
+    if (numberOfShootingWeapons >= 2) {
+      setAreShootingWeaponsDisabled(true);
+    } else {
+      setAreShootingWeaponsDisabled(false);
+    }
+  });
+
+  useEffect(() => {
     const numberOfCloseCombatWeaponsArray = [];
 
     unitArray.forEach((item, index) => {
-      const shootingWeapons = document.querySelectorAll(
-        `div.unit[id='${String(index)}'] ul[class='1'] li input`
-      );
-      const shootingWeaponsArray = Array.from(shootingWeapons);
-      const number1 = shootingWeaponsArray.filter(
-        (item) => item.checked === true
-      ).length;
-      numberOfShootingWeaponsArray.push(number1);
-
-      if (number1 >= 2) {
-        shootingWeaponsArray.forEach((item) => {
-          if (item.checked === false) {
-            item.disabled = true;
-          }
-        });
-      } else {
-        shootingWeaponsArray.forEach((item) => {
-          if (item.checked === false) {
-            item.disabled = false;
-          }
-        });
-      }
-
       const closeCombatWeapons = document.querySelectorAll(
         `div.unit[id='${String(index)}'] ul[class='0'] li input`
       );
@@ -97,6 +95,7 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
         });
       }
     });
+    console.log(numberOfCloseCombatWeaponsArray);
   });
 
   useEffect(() => {
@@ -113,11 +112,11 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
     const unit = unitList[e.target.className];
     const equipmentList = unit.optionalEquipment;
 
-    const trollRaces = Object.fromEntries(
-      Object.entries(unit.equipmentList).filter(([key]) =>
-        key.includes("Troll")
-      )
-    );
+    if (unit.unitName === "Dziki Ork") {
+      if (e.target.name === "Duża dźgacz") {
+        console.log("poopie");
+      }
+    }
 
     if (unit.unitName === "Troll") {
       if (e.target.name === "Troll Górski" && e.target.checked === true) {
@@ -138,7 +137,10 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
           "Łuskowata skóra (5+)",
           "Pomiot podmroku",
         ];
-      } else if (e.target.name === "Troll Rzeczny"&& e.target.checked === true) {
+      } else if (
+        e.target.name === "Troll Rzeczny" &&
+        e.target.checked === true
+      ) {
         unit.rules = [
           "Bycza szarża",
           "Duży cel",
@@ -372,10 +374,6 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
   };
 
   const handleCommandGroupClick = (e) => {
-    const commandGroupButton = document.querySelector(
-      `div[id='${id}'] input[name='command-group-checkbox']`
-    );
-
     const allCommandGroupButtonsArray = Array.from(
       document.querySelectorAll("input[name='command-group-checkbox']")
     );
@@ -392,9 +390,11 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
       allCommandGroupButtonsArray.forEach((item) => (item.disabled = false));
     }
 
-    setChecked(commandGroupButton.checked);
+    setChecked(e.target.checked);
     const unit = unitList[e.target.className];
-    unit.commandGroup = commandGroupButton.checked;
+
+    unit.commandGroup = e.target.checked;
+
     const equipmentList = unitList[e.target.className].optionalEquipment;
 
     if (e.target.name != "command-group-checkbox") {
@@ -479,7 +479,7 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
                           onClick={handleWeaponListClick}
                           checked={
                             unitList[id].optionalEquipment.includes(key) ||
-                            isStartingEquipment 
+                            isStartingEquipment
                           }
                           data={value[2]}
                           name={key}
@@ -488,7 +488,9 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
                           type="checkbox"
                           disabled={
                             unitList[id].startingEquipment.includes(key) ||
-                            isStartingEquipment
+                            isStartingEquipment ||
+                            (!unitList[id].optionalEquipment.includes(key) && areShootingWeaponsDisabled)
+
                           }
                           readOnly
                         ></input>
@@ -508,7 +510,8 @@ const WeaponList = ({ heroes, id, unitList, setUnitList }) => {
                             disabled={
                               unitList[id].startingEquipment.filter(
                                 (x) => x === key
-                              ).length === 2
+                              ).length === 2 ||
+                              areShootingWeaponsDisabled
                             }
                             readOnly
                           ></input>
